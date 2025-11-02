@@ -1,0 +1,48 @@
+{
+  "signature": "35ExR2i8kQCtivvwXpwA6yahUNSFtU5Cxe2RK3UmmtsUv3A8yeWHgcwgAWBPzSGgzhDxV7KdiSz4NrecRzEgyaDS",
+  "slot": 418711572,
+  "blockTime": 1762052643,
+  "blockTimeISO": "2025-11-02T03:04:03.000Z",
+  "success": true,
+  "fee": 5000,
+  "outerInstructions": 2,
+  "innerInstructions": 1,
+  "accountKeys": [
+    {
+      "index": 0,
+      "pubkey": "G4XHYnwNxnXkJ2Cg9z2DqjVP1iK7Dx9k6EKiZZBwnBaH"
+    },
+    {
+      "index": 1,
+      "pubkey": "7XCvzdWYSfx28jPgxqn46S4GnSjQjTATbhEz8ME4LCCH"
+    },
+    {
+      "index": 2,
+      "pubkey": "EPgK11Qa7XectzCN7N5XwnhWzg8Bz9TFY1CJyNMib2zD"
+    },
+    {
+      "index": 3,
+      "pubkey": "11111111111111111111111111111111"
+    },
+    {
+      "index": 4,
+      "pubkey": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+    },
+    {
+      "index": 5,
+      "pubkey": "G1tLVttDddYPk58qWAA4dSpAJEVxScHWovZEzkQQJLFa"
+    },
+    {
+      "index": 6,
+      "pubkey": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
+    },
+    {
+      "index": 7,
+      "pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+    }
+  ],
+  "programs": [
+    "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+  ]
+}

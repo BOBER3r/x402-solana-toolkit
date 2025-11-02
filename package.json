@@ -1,0 +1,40 @@
+{
+  "name": "x402-solana-toolkit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Production-grade TypeScript library for x402 payment protocol on Solana",
+  "keywords": [
+    "solana",
+    "x402",
+    "payment",
+    "usdc",
+    "blockchain",
+    "web3"
+  ],
+  "author": "x402-solana-toolkit contributors",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "clean": "npm run clean --workspaces && rm -rf node_modules",
+    "dev": "npm run dev --workspaces --if-present",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.24",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.54.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

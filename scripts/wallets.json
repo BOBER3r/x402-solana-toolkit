@@ -1,0 +1,15 @@
+{
+  "generated": "2025-11-02T02:53:43.141Z",
+  "treasury": {
+    "publicKey": "G1tLVttDddYPk58qWAA4dSpAJEVxScHWovZEzkQQJLFa",
+    "privateKey": "k4h2iVHBfy1Br4GCGZZV1YSeYyM4Dd9AmCLSUxpPH3EhRu5qJuprfY4GGVUs3YAWPs39v53NDj4xsFBDx1cNhHz",
+    "role": "treasury"
+  },
+  "agent": {
+    "publicKey": "G4XHYnwNxnXkJ2Cg9z2DqjVP1iK7Dx9k6EKiZZBwnBaH",
+    "privateKey": "43sEWzoa94LDSuCfceq3MxKVEuywi345HaXmKPp7Nk7QmiAsEc7EpviTMUdyMXMHiju6wjYGqDHJ5WCMmzKwxQDo",
+    "role": "agent"
+  },
+  "network": "devnet",
+  "usdcMint": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"
+}

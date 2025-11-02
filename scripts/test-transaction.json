@@ -1,0 +1,12 @@
+{
+  "signature": "35ExR2i8kQCtivvwXpwA6yahUNSFtU5Cxe2RK3UmmtsUv3A8yeWHgcwgAWBPzSGgzhDxV7KdiSz4NrecRzEgyaDS",
+  "timestamp": "2025-11-02T03:04:05.589Z",
+  "amount": 0.01,
+  "amountMicroUSDC": 10000,
+  "from": "G4XHYnwNxnXkJ2Cg9z2DqjVP1iK7Dx9k6EKiZZBwnBaH",
+  "to": "G1tLVttDddYPk58qWAA4dSpAJEVxScHWovZEzkQQJLFa",
+  "fromTokenAccount": "7XCvzdWYSfx28jPgxqn46S4GnSjQjTATbhEz8ME4LCCH",
+  "toTokenAccount": "EPgK11Qa7XectzCN7N5XwnhWzg8Bz9TFY1CJyNMib2zD",
+  "usdcMint": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr",
+  "explorerUrl": "https://explorer.solana.com/tx/35ExR2i8kQCtivvwXpwA6yahUNSFtU5Cxe2RK3UmmtsUv3A8yeWHgcwgAWBPzSGgzhDxV7KdiSz4NrecRzEgyaDS?cluster=devnet"
+}

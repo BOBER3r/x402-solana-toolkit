@@ -1,0 +1,37 @@
+{
+  "name": "@x402-solana/core",
+  "version": "0.1.0",
+  "description": "Core payment verification and x402 protocol implementation for Solana",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "x402",
+    "solana",
+    "payment",
+    "usdc",
+    "verification"
+  ],
+  "author": "x402-solana-toolkit contributors",
+  "license": "MIT",
+  "dependencies": {
+    "@solana/web3.js": "^1.87.6",
+    "@solana/spl-token": "^0.3.9",
+    "ioredis": "^5.3.2",
+    "bs58": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.10",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

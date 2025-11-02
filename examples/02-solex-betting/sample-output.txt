@@ -1,0 +1,139 @@
+================================================================
+  AI Betting Agent - Powered by x402
+================================================================
+
+Managing bankroll: $100.00
+Agent wallet: YjQ3MzE1...
+User wallet: 7kH9Zx2mPqL4wVnR8sT6uY3fD1cB5aJ9eG8hK0iM2oN4pQ6r
+
+----------------------------------------------------------------
+Step 1: Fetching active markets (FREE)
+----------------------------------------------------------------
+
+Found 8 active markets
+
+Top markets by volume:
+  1. Will the S&P 500 reach 7000 in 2025?
+     Category: politics | Volume: $350.00
+     Implied probability: 57.1%
+     Ends: Apr 1, 2025
+
+  2. Will Bitcoin reach $100k by EOY 2025?
+     Category: crypto | Volume: $250.00
+     Implied probability: 60.0%
+     Ends: Dec 2, 2024
+
+  3. Will Ethereum flip Bitcoin by market cap in 2025?
+     Category: crypto | Volume: $300.00
+     Implied probability: 26.7%
+     Ends: Jan 16, 2025
+
+  4. Will Solana TVL exceed $10B in 2025?
+     Category: crypto | Volume: $300.00
+     Implied probability: 60.0%
+     Ends: Jan 31, 2025
+
+  5. Will XRP win SEC lawsuit appeal in 2025?
+     Category: crypto | Volume: $300.00
+     Implied probability: 53.3%
+     Ends: Mar 17, 2025
+
+----------------------------------------------------------------
+Step 2: Getting AI recommendations (PAID - $0.05 USDC)
+----------------------------------------------------------------
+
+Payment required: $0.05 USDC
+Creating USDC transfer...
+Transaction signature: 3kZ8mPqL4wVnR8sT6uY3fD1cB5aJ9eG8hK0iM2oN4pQ6rYjQ3...
+Payment sent: $0.05 USDC
+Received 5 recommendations
+
+Portfolio metrics:
+  Total bet amount: $25.00
+  Expected ROI: 35.2%
+  Risk score: 50.0%
+
+Top recommendations:
+  1. Will Bitcoin reach $100k by EOY 2025?
+     Bet: NO | Amount: $5.00
+     Edge: 12.3% | Confidence: 78.5%
+
+  2. Will Solana TVL exceed $10B in 2025?
+     Bet: NO | Amount: $5.00
+     Edge: 11.8% | Confidence: 72.1%
+
+  3. Will Ethereum flip Bitcoin by market cap in 2025?
+     Bet: YES | Amount: $5.00
+     Edge: 10.9% | Confidence: 68.3%
+
+  4. Will the S&P 500 reach 7000 in 2025?
+     Bet: NO | Amount: $5.00
+     Edge: 9.7% | Confidence: 65.2%
+
+  5. Will XRP win SEC lawsuit appeal in 2025?
+     Bet: YES | Amount: $5.00
+     Edge: 8.4% | Confidence: 61.8%
+
+----------------------------------------------------------------
+Step 3: Executing top bet (PAID - $0.20 USDC)
+----------------------------------------------------------------
+
+Selected bet:
+  Market: Will Bitcoin reach $100k by EOY 2025?
+  Outcome: NO
+  Amount: $5.00
+  Expected edge: 12.3%
+  Confidence: 78.5%
+
+Execution pricing:
+  Base fee: $0.10
+  Percentage fee (2%): $0.10
+  Total execution cost: $0.20
+
+Payment required: $0.20 USDC
+Creating USDC transfer...
+Transaction signature: 7mP3qL4wVnR8sT6uY3fD1cB5aJ9eG8hK0iM2oN4pQ6rYjQ3MzE1...
+Payment sent: $0.20 USDC
+Bet placed successfully!
+  Signature: BET_k9m3n7p2q5r8t1v4w6x9z0a3c5e7g9i2k4m6n8p0q2r4t6u8w0
+  Estimated payout: $8.33
+
+================================================================
+  Cost Analysis & Expected Returns
+================================================================
+
+Costs:
+  AI Recommendations: $0.05
+  Bet Execution: $0.20
+  ----------------------------------------
+  Total x402 fees: $0.25
+
+Expected Returns:
+  Bet amount: $5.00
+  Expected edge: 12.3%
+  Confidence: 78.5%
+  Expected profit: $0.48
+  ----------------------------------------
+  Net expected profit: $0.23
+  ROI on fees: 92.0%
+
+  The x402 fees ($0.25) are justified by expected profit!
+
+================================================================
+  Value Proposition of x402
+================================================================
+
+For just $0.25 in micropayments, the agent:
+  - Analyzed 8+ markets instantly
+  - Received AI-powered recommendations
+  - Executed a bet on your behalf
+  - Expected to profit $0.48 (92% ROI on fees)
+
+Traditional API pricing would require:
+  - Monthly subscription ($50-200)
+  - Minimum commitment
+  - Pay even when not using
+
+With x402: Pay only for what you use, when you use it!
+
+================================================================
