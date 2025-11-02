@@ -1,6 +1,6 @@
 {
   "name": "@x402-solana/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Core payment verification and x402 protocol implementation for Solana",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

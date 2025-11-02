@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.1] - 2025-01-02
 
+### Added
+- **[@x402-solana/core]** Comprehensive package README for npm registry with code examples and API reference
+- **[@x402-solana/server]** Comprehensive package README for npm registry with framework integration guides
+- **[@x402-solana/client]** Comprehensive package README for npm registry with MCP integration examples
+
 ### Fixed
 - **[@x402-solana/client]** Fixed MCP protocol compatibility by changing debug logs from `console.log()` to `console.error()`
   - MCP protocol requires stdout for JSON-RPC only
