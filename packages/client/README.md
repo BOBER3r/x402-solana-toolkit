@@ -1,20 +1,26 @@
 # @x402-solana/client
 
-Client SDK for automatic x402 payment handling on Solana. This package provides a drop-in replacement for the standard `fetch` API that automatically handles HTTP 402 Payment Required responses by creating USDC payments on Solana.
+Client SDK for automatic x402 payment handling on Solana.
 
-## Features
+[![npm version](https://img.shields.io/npm/v/@x402-solana/client.svg)](https://www.npmjs.com/package/@x402-solana/client)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-- **Automatic Payment Handling**: Transparently handles 402 responses with USDC payments
-- **Simple API**: Drop-in replacement for standard `fetch`
-- **Solana Native**: Built on @solana/web3.js and SPL Token
-- **TypeScript Support**: Full type definitions included
-- **Comprehensive Testing**: Extensive test coverage with mocks
-- **Developer Friendly**: Clear error messages and debug logging
+## Overview
+
+`@x402-solana/client` provides a drop-in replacement for native `fetch()` that automatically handles x402 micropayments on Solana. When your code requests a paid API endpoint, this client:
+
+1. ✅ **Detects 402 Payment Required** responses
+2. ✅ **Creates USDC payment** on Solana automatically
+3. ✅ **Waits for confirmation** (400-800ms)
+4. ✅ **Retries request** with payment proof
+5. ✅ **Returns data** seamlessly
+
+**Perfect for AI agents, CLI tools, and automated systems that need to pay for API access.**
 
 ## Installation
 
 ```bash
-npm install @x402-solana/client @solana/web3.js @solana/spl-token
+npm install @x402-solana/client @solana/web3.js
 ```
 
 ## Quick Start
@@ -22,336 +28,113 @@ npm install @x402-solana/client @solana/web3.js @solana/spl-token
 ```typescript
 import { X402Client } from '@x402-solana/client';
 
-// Initialize client
 const client = new X402Client({
   solanaRpcUrl: 'https://api.devnet.solana.com',
-  walletPrivateKey: 'your-base58-private-key',
+  walletPrivateKey: process.env.WALLET_PRIVATE_KEY, // Base58 encoded
   network: 'devnet',
-  debug: true, // Enable logging
 });
 
-// Use like regular fetch - payments are automatic
+// Use exactly like fetch() - payments happen automatically!
 const response = await client.fetch('https://api.example.com/premium-data');
 const data = await response.json();
 
-console.log(data);
+console.log('Got data:', data);
+// Payment was handled automatically behind the scenes!
 ```
 
-## Configuration
+**That's it!** The client handles all payment complexity for you.
 
-### X402ClientConfig
+## Features
 
-```typescript
-interface X402ClientConfig {
-  // Required
-  solanaRpcUrl: string;           // Solana RPC endpoint
-  walletPrivateKey: string | Uint8Array; // Wallet private key
-
-  // Optional
-  network?: 'devnet' | 'mainnet-beta';  // Default: 'mainnet-beta'
-  autoRetry?: boolean;                   // Default: true
-  maxRetries?: number;                   // Default: 3
-  commitment?: 'processed' | 'confirmed' | 'finalized'; // Default: 'confirmed'
-  debug?: boolean;                       // Default: false
-}
-```
-
-## API Reference
-
-### X402Client
-
-Main client class for handling x402 payments.
-
-#### Methods
-
-##### `fetch(url: string, options?: RequestInit): Promise<Response>`
-
-Fetch with automatic x402 payment handling.
-
-```typescript
-const response = await client.fetch('https://api.example.com/data', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ query: 'search term' }),
-});
-```
-
-##### `getUSDCBalance(): Promise<number>`
-
-Get wallet's USDC balance.
-
-```typescript
-const balance = await client.getUSDCBalance();
-console.log(`Balance: ${balance} USDC`);
-```
-
-##### `getSOLBalance(): Promise<number>`
-
-Get wallet's SOL balance.
-
-```typescript
-const balance = await client.getSOLBalance();
-console.log(`Balance: ${balance} SOL`);
-```
-
-##### `getPublicKey(): PublicKey`
-
-Get wallet's public key.
-
-```typescript
-const publicKey = client.getPublicKey();
-console.log(`Wallet: ${publicKey.toString()}`);
-```
-
-##### `getUSDCMint(): PublicKey`
-
-Get USDC mint address for current network.
-
-```typescript
-const mint = client.getUSDCMint();
-```
-
-##### `getUSDCTokenAccount(): PublicKey`
-
-Get wallet's USDC token account address.
-
-```typescript
-const tokenAccount = client.getUSDCTokenAccount();
-```
-
-### WalletManager
-
-Utility for managing Solana wallets (for testing/development).
-
-#### Methods
-
-##### `static generateWallet(): WalletInfo`
-
-Generate a new random wallet.
-
-```typescript
-const wallet = WalletManager.generateWallet();
-console.log(`Public key: ${wallet.publicKey}`);
-console.log(`Private key: ${wallet.privateKey}`);
-```
-
-##### `static fromPrivateKey(privateKey: string | Uint8Array): WalletInfo`
-
-Create wallet from existing private key.
-
-```typescript
-const wallet = WalletManager.fromPrivateKey('your-base58-key');
-```
-
-##### `static airdropSOL(connection: Connection, publicKey: PublicKey, amountSOL: number): Promise<string>`
-
-Request SOL airdrop (devnet/testnet only).
-
-```typescript
-const connection = new Connection('https://api.devnet.solana.com');
-const signature = await WalletManager.airdropSOL(
-  connection,
-  publicKey,
-  1.0
-);
-```
-
-### PaymentSender
-
-Low-level payment utilities for advanced use cases.
-
-#### Methods
-
-##### `sendUSDC(recipientWallet: string, amountUSDC: number, usdcMint: string, options?: SendUSDCOptions): Promise<string>`
-
-Send USDC payment to a recipient.
-
-```typescript
-const sender = new PaymentSender(connection, wallet);
-const signature = await sender.sendUSDC(
-  'recipient-address',
-  0.5,
-  usdcMint,
-  { createTokenAccount: true }
-);
-```
-
-##### `estimatePaymentCost(amountUSDC: number, usdcMint: string): Promise<PaymentCostEstimate>`
-
-Estimate payment cost including fees.
-
-```typescript
-const estimate = await sender.estimatePaymentCost(0.5, usdcMint);
-console.log(`Total cost: ${estimate.totalUSD} USD`);
-console.log(`SOL fee: ${estimate.solFee} SOL`);
-```
+- ✅ **Drop-in Fetch Replacement** - Same API as native `fetch()`
+- ✅ **Automatic Payments** - Detects 402, pays, retries automatically
+- ✅ **USDC on Solana** - Fast, cheap micropayments
+- ✅ **Error Handling** - Clear error messages for payment issues
+- ✅ **Retry Logic** - Exponential backoff for transient failures
+- ✅ **TypeScript** - Fully typed with IntelliSense support
+- ✅ **Debug Mode** - Optional logging for troubleshooting
+- ✅ **MCP Compatible** - Works in Model Context Protocol servers
 
 ## Usage Examples
 
-### Basic Payment Flow
+### Basic GET Request
 
 ```typescript
-import { X402Client } from '@x402-solana/client';
-
-const client = new X402Client({
-  solanaRpcUrl: 'https://api.devnet.solana.com',
-  walletPrivateKey: process.env.WALLET_PRIVATE_KEY,
-  network: 'devnet',
-});
-
-// 1. Request will receive 402 Payment Required
-// 2. Client automatically creates USDC payment
-// 3. Request is retried with payment proof
-// 4. Response is returned
-const response = await client.fetch('https://api.example.com/premium');
-const data = await response.json();
-```
-
-### Check Balance Before Request
-
-```typescript
-const balance = await client.getUSDCBalance();
-console.log(`Current balance: ${balance} USDC`);
-
-if (balance < 1.0) {
-  console.log('Insufficient balance for request');
-} else {
-  const response = await client.fetch('https://api.example.com/data');
-}
-```
-
-### Disable Auto-Retry
-
-```typescript
-const client = new X402Client({
-  solanaRpcUrl: 'https://api.devnet.solana.com',
-  walletPrivateKey: process.env.WALLET_PRIVATE_KEY,
-  network: 'devnet',
-  autoRetry: false, // Don't automatically pay
-});
-
 const response = await client.fetch('https://api.example.com/data');
-
-if (response.status === 402) {
-  const paymentReq = await response.json();
-  console.log('Payment required:', paymentReq);
-  // Handle manually
-}
+const json = await response.json();
 ```
 
-### Generate Test Wallet
+### POST with Body
 
 ```typescript
-import { WalletManager } from '@x402-solana/client';
-import { Connection } from '@solana/web3.js';
-
-// Generate new wallet
-const wallet = WalletManager.generateWallet();
-console.log(`Wallet created: ${wallet.publicKey}`);
-
-// Fund with devnet SOL
-const connection = new Connection('https://api.devnet.solana.com');
-await WalletManager.airdropSOL(
-  connection,
-  new PublicKey(wallet.publicKey),
-  1.0
-);
-
-// Use with client
-const client = new X402Client({
-  solanaRpcUrl: 'https://api.devnet.solana.com',
-  walletPrivateKey: wallet.privateKey,
-  network: 'devnet',
+const response = await client.fetch('https://api.example.com/analyze', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ query: 'bitcoin price' }),
 });
+const result = await response.json();
 ```
 
 ### Error Handling
 
 ```typescript
-import { X402Client, PaymentError, PaymentErrorCode } from '@x402-solana/client';
-
 try {
   const response = await client.fetch('https://api.example.com/data');
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+
   const data = await response.json();
 } catch (error) {
-  if (error instanceof PaymentError) {
-    switch (error.code) {
-      case PaymentErrorCode.INSUFFICIENT_BALANCE:
-        console.error('Not enough USDC:', error.details);
-        break;
-      case PaymentErrorCode.TRANSACTION_FAILED:
-        console.error('Payment transaction failed:', error.details);
-        break;
-      case PaymentErrorCode.NETWORK_ERROR:
-        console.error('Network error:', error.message);
-        break;
-      default:
-        console.error('Payment error:', error.message);
-    }
-  } else {
-    console.error('Unknown error:', error);
+  if (error.code === 'INSUFFICIENT_BALANCE') {
+    console.error('Not enough USDC in wallet!');
+  } else if (error.code === 'PAYMENT_TIMEOUT') {
+    console.error('Payment took too long to confirm');
   }
 }
 ```
 
-## Testing
+## MCP Integration
 
-```bash
-# Run tests
-npm test
+This client works perfectly in Model Context Protocol (MCP) servers!
 
-# Run tests in watch mode
-npm run test:watch
+```typescript
+import { X402Client } from '@x402-solana/client';
 
-# Run tests with coverage
-npm test -- --coverage
+const x402Client = new X402Client({
+  solanaRpcUrl: process.env.SOLANA_RPC_URL!,
+  walletPrivateKey: process.env.MCP_WALLET_PRIVATE_KEY!,
+  network: 'mainnet-beta',
+  debug: true, // Safe in v0.1.1+ (logs to stderr, not stdout)
+});
+
+// Use in MCP tool handlers
+const response = await x402Client.fetch('https://api.example.com/premium');
 ```
 
-## Development
+**Note:** v0.1.1+ uses `console.error()` for debug logs (stderr), making it MCP-compatible.
 
-```bash
-# Install dependencies
-npm install
+## Changelog
 
-# Build
-npm run build
+### v0.1.1 (2025-01-02)
+- **Fixed:** Debug logs now use `console.error()` instead of `console.log()`
+  - Makes client compatible with MCP servers
+  - Debug mode can now be safely enabled in MCP environments
 
-# Clean build artifacts
-npm run clean
-```
-
-## Error Codes
-
-- `INSUFFICIENT_BALANCE`: Wallet doesn't have enough USDC or SOL
-- `TRANSACTION_FAILED`: Payment transaction failed on-chain
-- `CONFIRMATION_TIMEOUT`: Transaction confirmation timed out
-- `INVALID_PAYMENT_REQUIREMENTS`: Server's payment requirements are malformed
-- `NETWORK_ERROR`: Network or RPC error occurred
-- `UNSUPPORTED_PAYMENT_METHOD`: Server requires unsupported payment method
-
-## Network Support
-
-### Devnet
-- USDC Mint: `4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU`
-- RPC: `https://api.devnet.solana.com`
-
-### Mainnet
-- USDC Mint: `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`
-- RPC: `https://api.mainnet-beta.solana.com`
-
-## Security Considerations
-
-1. **Private Key Storage**: Never commit private keys to version control
-2. **Environment Variables**: Store keys in environment variables or secure vaults
-3. **Balance Checks**: Monitor wallet balance to prevent failed transactions
-4. **Transaction Simulation**: Client uses preflight checks to validate transactions
-5. **Confirmation**: Waits for transaction confirmation before retrying requests
-
-## License
-
-MIT
+### v0.1.0 (2025-01-02)
+- Initial release
 
 ## Related Packages
 
-- [@x402-solana/core](../core) - Core x402 protocol types and utilities
-- [@x402-solana/server](../server) - Server SDK for accepting x402 payments
+- **[@x402-solana/server](https://www.npmjs.com/package/@x402-solana/server)** - Add x402 to your API
+- **[@x402-solana/core](https://www.npmjs.com/package/@x402-solana/core)** - Low-level verification
+
+## Documentation
+
+- [Full Documentation](https://github.com/BOBER3r/x402-solana-toolkit)
+- [Getting Started Guide](https://github.com/BOBER3r/x402-solana-toolkit/blob/main/GETTING_STARTED.md)
+
+## License
+
+MIT © 2025

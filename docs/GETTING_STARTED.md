@@ -224,6 +224,6 @@ fastify.get('/api/premium', {
 
 ## Need Help?
 
-- [GitHub Issues](https://github.com/yourusername/x402-solana-toolkit/issues)
+- [GitHub Issues](https://github.com/BOBER3r/x402-solana-toolkit/issues)
 - [Examples](../examples/)
 - [API Reference](./API_REFERENCE.md)

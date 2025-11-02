@@ -467,10 +467,13 @@ export class X402Client {
 
   /**
    * Log debug messages if debug mode is enabled
+   *
+   * Note: Uses console.error() instead of console.log() for MCP compatibility.
+   * MCP protocol requires stdout for JSON-RPC only, so debug logs go to stderr.
    */
   private log(message: string): void {
     if (this.debug) {
-      console.log(`[X402Client] ${message}`);
+      console.error(`[X402Client] ${message}`);
     }
   }
 
