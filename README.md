@@ -9,8 +9,7 @@
 
 A production-grade TypeScript library that enables any HTTP API on Solana to implement the official **x402 payment protocol**. Framework-agnostic, fully typed, and battle-tested.
 
-> **🏆 x402 Hackathon Qualified**: This toolkit is fully compliant with the official x402 protocol specification and qualifies for the "Best x402 Dev Tool" track ($10K prize pool). [See X402_COMPLIANCE.md](./X402_COMPLIANCE.md) for detailed compliance documentation.
-
+> **🏆 x402 Hackathon**: This toolkit is fully compliant with the official x402 protocol specification and qualifies for the "Best x402 Dev Tool" track. [See X402_COMPLIANCE.md](./X402_COMPLIANCE.md) 
 ---
 
 ## 📥 Installation
