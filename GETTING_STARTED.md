@@ -519,8 +519,8 @@ spl-token balance --owner YOUR_WALLET_ADDRESS EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEG
 
 ## Support
 
-- **GitHub**: https://github.com/your-org/x402-solana-toolkit
-- **Issues**: https://github.com/your-org/x402-solana-toolkit/issues
+- **GitHub**: https://github.com/BOBER3r/x402-solana-toolkit
+- **Issues**: https://github.com/BOBER3r/x402-solana-toolkit/issues
 - **Examples**: See `/examples` directory
 - **Docs**: Full API documentation in `/docs`
 

@@ -95,17 +95,85 @@ npm run demo
 
 ---
 
+### 4. NestJS API (`04-nestjs-api/`)
+
+**Production-ready NestJS microservice**
+
+Enterprise-grade TypeScript framework with x402 decorators and guards.
+
+- **Complexity**: Intermediate
+- **Framework**: NestJS
+- **Features**: Guards, Decorators, Modules
+- **Pricing**: Free, $0.001, $0.005 tiers
+
+**What you'll learn:**
+- NestJS x402 module integration
+- Using @RequirePayment() decorator
+- Guards for route protection
+- Dependency injection patterns
+- TypeScript best practices
+
+**When to use this:**
+- Building enterprise microservices
+- Need scalable architecture
+- Want dependency injection
+- TypeScript-first development
+- Microservice patterns
+
+```bash
+cd 04-nestjs-api
+npm install
+npm run demo
+```
+
+---
+
+### 5. Fastify API (`05-fastify-api/`)
+
+**High-performance Fastify server**
+
+One of the fastest Node.js frameworks with x402 plugin system.
+
+- **Complexity**: Intermediate
+- **Framework**: Fastify
+- **Features**: Plugins, Hooks, Performance
+- **Pricing**: Free, $0.001, $0.005 tiers
+
+**What you'll learn:**
+- Fastify plugin system
+- Route option configuration
+- High-performance patterns
+- Type-safe request handling
+- Performance optimization
+
+**When to use this:**
+- Need maximum performance (70k+ req/s)
+- High-frequency trading APIs
+- Real-time data feeds
+- Low-latency requirements
+- Streaming services
+
+```bash
+cd 05-fastify-api
+npm install
+npm run demo
+```
+
+---
+
 ## Comparison Table
 
-| Feature | Basic API | Weather API | Solex Betting |
-|---------|-----------|-------------|---------------|
-| **Complexity** | Beginner | Intermediate | Advanced |
-| **Server Lines** | 78 | 226 | 500+ |
-| **Client Lines** | 43 | 131 | 350+ |
-| **Pricing Tiers** | 2 | 3 | 4 |
-| **Use Case** | Getting started | Data API | Complete app |
-| **Setup Time** | 5 minutes | 10 minutes | 20 minutes |
-| **Best For** | Learning | Production API | Full platform |
+| Feature | Basic API | Weather API | Solex Betting | NestJS API | Fastify API |
+|---------|-----------|-------------|---------------|------------|-------------|
+| **Framework** | Express | Express | Express | NestJS | Fastify |
+| **Complexity** | Beginner | Intermediate | Advanced | Intermediate | Intermediate |
+| **Server Lines** | 78 | 226 | 500+ | 125 | 95 |
+| **Client Lines** | 43 | 131 | 350+ | 65 | 65 |
+| **Pricing Tiers** | 2 | 3 | 4 | 3 | 3 |
+| **Performance** | ~30k req/s | ~30k req/s | ~25k req/s | ~25k req/s | ~70k req/s |
+| **Use Case** | Getting started | Data API | Complete app | Enterprise | High-perf |
+| **Setup Time** | 5 minutes | 10 minutes | 20 minutes | 10 minutes | 10 minutes |
+| **Best For** | Learning | Production API | Full platform | Microservices | Speed |
 
 ## Quick Setup (All Examples)
 
@@ -172,6 +240,20 @@ For devnet testing:
 - Complex multi-tier pricing
 - Analytics and reporting
 - Production deployment patterns
+
+**Choose NestJS API if you want to:**
+- Enterprise-grade TypeScript architecture
+- Dependency injection patterns
+- Decorators and guards
+- Scalable microservices
+- Best practices for large teams
+
+**Choose Fastify API if you want to:**
+- Maximum performance (70k+ req/s)
+- Low-latency requirements
+- High-frequency trading
+- Real-time data streaming
+- Plugin-based architecture
 
 ## Code Patterns
 

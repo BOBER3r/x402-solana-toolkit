@@ -749,8 +749,8 @@ describe('x402 Integration', () => {
 
 ## Support & Contributing
 
-- **Issues**: https://github.com/your-org/x402-solana-toolkit/issues
-- **Discussions**: https://github.com/your-org/x402-solana-toolkit/discussions
+- **Issues**: https://github.com/BOBER3r/x402-solana-toolkit/issues
+- **Discussions**: https://github.com/BOBER3r/x402-solana-toolkit/discussions
 - **Documentation**: https://docs.x402-solana.dev
 
 ---
