@@ -147,7 +147,6 @@ function PremiumContent() {
 
 ### ✅ Production Ready
 - Full TypeScript with strict mode
-- 80%+ test coverage
 - Transaction replay protection
 - Exponential backoff retry logic
 - Redis caching support
@@ -159,7 +158,6 @@ function PremiumContent() {
 - Generic HTTP handler
 
 ### ✅ Developer Experience
-- Add payments in < 5 lines of code
 - Clear error messages
 - Comprehensive examples
 - Complete API documentation
@@ -212,14 +210,6 @@ See [X402_COMPLIANCE.md](./X402_COMPLIANCE.md) for:
 - Type definitions
 - Security considerations
 - Testing & verification
-
-### 🎯 Hackathon Qualification
-
-This toolkit qualifies for the **Solana x402 Hackathon "Best x402 Dev Tool" track**:
-- Prize Pool: $10,000
-- Deadline: November 11, 2025
-- Full x402 v1 compliance
-- Production-grade implementation
 
 ---
 
