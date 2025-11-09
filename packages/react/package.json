@@ -1,7 +1,7 @@
 {
   "name": "@x402-solana/react",
-  "version": "0.2.0",
-  "description": "React hooks and components for x402 payment protocol on Solana",
+  "version": "0.3.0",
+  "description": "React hooks and UI components for x402 payment protocol on Solana",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -24,6 +24,8 @@
     "x402",
     "react",
     "hooks",
+    "components",
+    "ui",
     "wallet",
     "payment",
     "usdc",

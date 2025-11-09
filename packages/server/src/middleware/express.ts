@@ -57,6 +57,14 @@ export interface X402MiddlewareConfig {
 
   /** Enable debug logging (default: false) */
   debug?: boolean;
+
+  /** Webhook configuration (optional) */
+  webhook?: {
+    /** Enable webhook manager */
+    enabled?: boolean;
+    /** Queue processing interval in milliseconds (default: 1000) */
+    processInterval?: number;
+  };
 }
 
 /**
@@ -87,6 +95,29 @@ export interface MiddlewareOptions {
 
   /** Optional additional data (scheme-specific) */
   extra?: object | null;
+
+  /** Webhook URL to send payment notifications to */
+  webhookUrl?: string;
+
+  /** Webhook secret for HMAC signature generation */
+  webhookSecret?: string;
+
+  /** Webhook events to subscribe to (default: ['payment.confirmed']) */
+  webhookEvents?: ('payment.confirmed' | 'payment.failed')[];
+
+  /** Webhook retry configuration */
+  webhookRetry?: {
+    maxAttempts?: number;
+    initialDelay?: number;
+    maxDelay?: number;
+    backoff?: 'exponential' | 'linear';
+  };
+
+  /** Webhook timeout in milliseconds (default: 5000) */
+  webhookTimeout?: number;
+
+  /** Additional webhook headers */
+  webhookHeaders?: Record<string, string>;
 }
 
 /**
@@ -114,6 +145,7 @@ export class X402Middleware {
   private verifier: TransactionVerifier;
   private generator: PaymentRequirementsGenerator;
   private config: X402MiddlewareConfig;
+  private webhookManager: any; // WebhookManager (lazy loaded)
 
   /**
    * Create x402 middleware
@@ -139,11 +171,17 @@ export class X402Middleware {
       network: config.network,
     });
 
+    // Initialize webhook manager if enabled
+    if (config.webhook?.enabled) {
+      this.initializeWebhookManager();
+    }
+
     if (config.debug) {
       console.log('[x402] Middleware initialized:', {
         network: config.network,
         recipientWallet: config.recipientWallet,
         recipientUSDCAccount: this.generator.getRecipientUSDCAccount(),
+        webhookEnabled: !!config.webhook?.enabled,
       });
     }
   }
@@ -275,7 +313,20 @@ export class X402Middleware {
 
         res.setHeader('X-PAYMENT-RESPONSE', this.encodePaymentResponse(receipt));
 
-        // 7. Continue to handler
+        // 7. Send webhook if configured
+        if (options?.webhookUrl && options?.webhookSecret) {
+          this.sendWebhookNotification(
+            options,
+            priceUSD,
+            result,
+            req.path
+          ).catch((error) => {
+            console.error('[x402] Webhook delivery failed:', error);
+            // Don't fail the request if webhook fails
+          });
+        }
+
+        // 8. Continue to handler
         next();
       } catch (error: any) {
         // Internal error during verification
@@ -341,10 +392,86 @@ export class X402Middleware {
   }
 
   /**
+   * Initialize webhook manager (lazy load)
+   */
+  private initializeWebhookManager(): void {
+    try {
+      const { WebhookManager } = require('../webhooks/webhook-manager');
+      this.webhookManager = new WebhookManager({
+        redis: this.config.redis,
+        debug: this.config.debug,
+        queueProcessInterval: this.config.webhook?.processInterval,
+      });
+    } catch (error: any) {
+      console.error('[x402] Failed to initialize webhook manager:', error.message);
+    }
+  }
+
+  /**
+   * Send webhook notification for payment
+   */
+  private async sendWebhookNotification(
+    options: MiddlewareOptions,
+    priceUSD: number,
+    verificationResult: any,
+    resource: string
+  ): Promise<void> {
+    if (!options.webhookUrl || !options.webhookSecret) {
+      return;
+    }
+
+    // Lazy load webhook manager if not already loaded
+    if (!this.webhookManager) {
+      const { WebhookManager } = require('../webhooks/webhook-manager');
+      this.webhookManager = new WebhookManager({
+        redis: this.config.redis,
+        debug: this.config.debug,
+      });
+    }
+
+    const payload = {
+      event: 'payment.confirmed' as const,
+      timestamp: Date.now(),
+      payment: {
+        signature: verificationResult.signature || '',
+        amount: verificationResult.transfer?.amount || 0,
+        amountUSD: priceUSD,
+        payer: verificationResult.transfer?.authority || '',
+        recipient: this.config.recipientWallet,
+        resource: options.resource || resource,
+        blockTime: verificationResult.blockTime,
+        slot: verificationResult.slot,
+      },
+    };
+
+    const webhookConfig = {
+      url: options.webhookUrl,
+      secret: options.webhookSecret,
+      events: options.webhookEvents || ['payment.confirmed' as const],
+      retry: options.webhookRetry,
+      timeout: options.webhookTimeout,
+      headers: options.webhookHeaders,
+    };
+
+    await this.webhookManager.sendWithRetry(webhookConfig, payload);
+  }
+
+  /**
+   * Get webhook manager instance (if enabled)
+   */
+  getWebhookManager(): any {
+    return this.webhookManager;
+  }
+
+  /**
    * Close middleware and cleanup resources
    */
   async close(): Promise<void> {
     await this.verifier.close();
+
+    if (this.webhookManager) {
+      await this.webhookManager.close();
+    }
   }
 }
 

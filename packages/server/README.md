@@ -61,6 +61,7 @@ app.listen(3000);
 - ✅ **One-Line Integration** - Add payments with single middleware call
 - ✅ **Automatic Verification** - Validates USDC transfers on-chain
 - ✅ **Replay Protection** - Prevents payment reuse
+- ✅ **Webhook System** - Async payment notifications with retry logic (NEW in v0.2.1)
 - ✅ **TypeScript** - Fully typed with excellent DX
 - ✅ **Redis Support** - Scales across multiple servers
 - ✅ **Dynamic Pricing** - Set different prices per endpoint
@@ -419,14 +420,94 @@ const response = await client.fetch('http://localhost:3000/api/premium');
 expect(response.ok).toBe(true);
 ```
 
+## Webhooks (NEW in v0.2.1)
+
+Get notified asynchronously when payments are confirmed, making your API 8-16x faster!
+
+### Why Webhooks?
+
+**Before (Synchronous):**
+```
+Client → Server → Wait 400-800ms for blockchain → Response
+```
+
+**After (Async with Webhooks):**
+```
+Client → Server → 202 Accepted (<50ms)
+        ↓
+Server → Verify async → Webhook fires → Client gets notification
+```
+
+### Quick Start
+
+```typescript
+import { requirePayment } from '@x402-solana/server';
+
+app.post('/api/data',
+  requirePayment(0.001, {
+    webhookUrl: 'https://my-app.com/hooks/payment',
+    webhookSecret: process.env.WEBHOOK_SECRET,
+    webhookRetry: {
+      maxAttempts: 3,
+      backoff: 'exponential'
+    }
+  }),
+  handler
+);
+```
+
+### Webhook Payload
+
+```typescript
+{
+  "event": "payment.confirmed",
+  "payment": {
+    "signature": "5xyz...abc",
+    "amount": 1000,
+    "payer": "9xQe...7yL",
+    "timestamp": 1699564800000,
+    "resource": "/api/data"
+  },
+  "signature": "hmac-sha256..." // For verification
+}
+```
+
+### Receiving Webhooks
+
+```typescript
+import { createWebhookReceiverEndpoint } from '@x402-solana/server';
+
+app.post('/webhooks/payment',
+  createWebhookReceiverEndpoint(
+    process.env.WEBHOOK_SECRET,
+    (payload) => {
+      console.log('Payment confirmed:', payload);
+      // Send data to client, update database, etc.
+    }
+  )
+);
+```
+
+### Features
+
+- ✅ **HMAC-SHA256 Signatures** - Cryptographically secure
+- ✅ **Exponential Backoff** - Retry failed deliveries (100ms → 200ms → 400ms)
+- ✅ **Redis Support** - Production-grade queue
+- ✅ **Delivery Tracking** - Logs and metrics
+- ✅ **Mock Server** - Testing utilities included
+
+📚 **[Full Webhook Documentation](./WEBHOOKS.md)**
+
 ## Related Packages
 
 - **[@x402-solana/client](https://www.npmjs.com/package/@x402-solana/client)** - Auto-payment client
 - **[@x402-solana/core](https://www.npmjs.com/package/@x402-solana/core)** - Core verification logic
+- **[@x402-solana/react](https://www.npmjs.com/package/@x402-solana/react)** - React hooks and UI components
 
 ## Documentation
 
 - [Full Documentation](https://github.com/BOBER3r/x402-solana-toolkit)
+- [Webhook Guide](./WEBHOOKS.md) - Complete webhook documentation
 - [Getting Started Guide](https://github.com/BOBER3r/x402-solana-toolkit/blob/main/GETTING_STARTED.md)
 - [Examples](https://github.com/BOBER3r/x402-solana-toolkit/tree/main/examples)
 

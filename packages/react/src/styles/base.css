@@ -1,0 +1,198 @@
+/**
+ * Base CSS styles for x402 React components
+ *
+ * Optional: Import this file to get default styling for all components.
+ * All components work without this CSS using inline styles.
+ */
+
+/* ===== Global Animations ===== */
+@keyframes x402-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes x402-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes x402-slide-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== PaymentButton Hover Effects ===== */
+.x402-payment-button:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.x402-payment-button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.x402-payment-button-primary:not(:disabled):hover {
+  background-color: #2563eb;
+}
+
+.x402-payment-button-secondary:not(:disabled):hover {
+  background-color: #4b5563;
+}
+
+.x402-payment-button-outline:not(:disabled):hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.x402-payment-button-ghost:not(:disabled):hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* ===== WalletConnect Hover Effects ===== */
+.x402-wallet-connect:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.x402-wallet-connect:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.x402-wallet-connect-primary:not(:disabled):hover {
+  background-color: #2563eb;
+}
+
+.x402-wallet-connect-secondary:not(:disabled):hover {
+  background-color: #4b5563;
+}
+
+.x402-wallet-connect-outline:not(:disabled):hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.x402-wallet-connect-ghost:not(:disabled):hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* ===== BalanceBadge Effects ===== */
+.x402-balance-badge {
+  animation: x402-fade-in 0.3s ease;
+}
+
+.x402-balance-low {
+  animation: x402-pulse 2s ease-in-out infinite;
+}
+
+@keyframes x402-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* ===== PaymentStatus Effects ===== */
+.x402-payment-status {
+  animation: x402-slide-down 0.3s ease;
+}
+
+.x402-payment-status-confirmed {
+  animation: x402-fade-in 0.5s ease;
+}
+
+/* ===== PaymentHistory Table Effects ===== */
+.x402-payment-history-table {
+  animation: x402-fade-in 0.3s ease;
+}
+
+.x402-payment-history-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+/* ===== Accessibility ===== */
+.x402-payment-button:focus-visible,
+.x402-wallet-connect:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* ===== Print Styles ===== */
+@media print {
+  .x402-payment-button,
+  .x402-wallet-connect,
+  .x402-balance-refresh {
+    display: none;
+  }
+}
+
+/* ===== Responsive Utilities ===== */
+@media (max-width: 640px) {
+  .x402-payment-history-table {
+    font-size: 12px;
+  }
+
+  .x402-payment-button,
+  .x402-wallet-connect {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
+
+/* ===== Dark Mode Support (Optional) ===== */
+@media (prefers-color-scheme: dark) {
+  .x402-payment-button-outline {
+    border-color: #60a5fa;
+    color: #60a5fa;
+  }
+
+  .x402-payment-button-ghost {
+    color: #e5e7eb;
+  }
+
+  .x402-balance-badge {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+
+  .x402-payment-history-table {
+    color: #e5e7eb;
+  }
+}
+
+/* ===== Component Transitions ===== */
+.x402-payment-button,
+.x402-wallet-connect,
+.x402-balance-badge,
+.x402-payment-status,
+.x402-price-tag {
+  transition: all 0.2s ease;
+}
+
+/* ===== Icon Animations ===== */
+.x402-spinner-svg {
+  animation: x402-spin 0.8s linear infinite;
+}
+
+.x402-icon {
+  transition: transform 0.2s ease;
+}
+
+.x402-icon:hover {
+  transform: scale(1.1);
+}
+
+/* ===== Focus Management ===== */
+.x402-payment-button:focus,
+.x402-wallet-connect:focus,
+button:focus {
+  outline: none;
+}
+
+.x402-payment-button:focus-visible,
+.x402-wallet-connect:focus-visible,
+button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}

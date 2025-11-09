@@ -7,10 +7,14 @@ Make any React app accept micropayments with just a few lines of code!
 ## Features
 
 - 🎣 **React Hooks** - `useX402Payment()`, `useWalletBalance()`, `usePaymentHistory()`
+- 🎨 **UI Components** - Pre-built payment buttons, balance badges, transaction history (NEW in v0.3.0)
 - 🔌 **Wallet Adapter Integration** - Works with Phantom, Solflare, and all Solana wallets
 - 🚀 **Automatic 402 Handling** - Detects 402 responses and automatically creates payments
 - 💾 **Payment History** - Built-in localStorage persistence
 - 📊 **Balance Monitoring** - Real-time USDC and SOL balance tracking
+- 🌙 **Dark Mode** - Built-in theme support with customization
+- 📱 **Mobile Responsive** - Works perfectly on all screen sizes
+- ♿ **Accessible** - WCAG 2.1 AA compliant
 - 🔥 **TypeScript First** - Full type safety and IntelliSense support
 - ⚡ **Zero Configuration** - Works out of the box with sensible defaults
 
@@ -233,6 +237,172 @@ Main provider component that wraps your app.
   <YourApp />
 </X402Provider>
 ```
+
+## UI Components (NEW in v0.3.0)
+
+Pre-built, production-ready components that reduce integration time from hours to minutes!
+
+### PaymentButton
+
+Primary CTA for paid actions with built-in payment handling.
+
+```tsx
+import { PaymentButton } from '@x402-solana/react';
+
+<PaymentButton
+  priceUSD={0.001}
+  description="Get BTC price data"
+  onSuccess={(data) => console.log('Payment successful!', data)}
+  onError={(error) => console.error('Payment failed:', error)}
+  variant="primary"  // 'primary' | 'secondary' | 'outline'
+  size="md"          // 'sm' | 'md' | 'lg'
+>
+  Get Premium Data
+</PaymentButton>
+```
+
+**Features:**
+- Auto-detects wallet connection
+- Loading states with spinner
+- Success/error animations
+- Customizable variants and sizes
+
+### BalanceBadge
+
+Real-time wallet balance display with low balance warnings.
+
+```tsx
+import { BalanceBadge } from '@x402-solana/react';
+
+<BalanceBadge
+  showUSDC={true}
+  showSOL={true}
+  refreshInterval={10000}      // Auto-refresh every 10s
+  lowBalanceThreshold={0.01}   // Warn when USDC < 0.01
+/>
+```
+
+**Output:**
+```
+💰 Balance
+SOL: 0.5
+USDC: 10.50
+```
+
+### PaymentStatus
+
+Transaction confirmation tracking with progress indicator.
+
+```tsx
+import { PaymentStatus } from '@x402-solana/react';
+
+<PaymentStatus
+  signature="5xyz...abc"
+  network="devnet"
+  showDetails={true}
+  onConfirmed={() => console.log('Payment confirmed!')}
+/>
+```
+
+**Shows:**
+- Confirmation progress (1/32 confirmations)
+- Link to block explorer
+- Estimated completion time
+
+### PaymentHistory
+
+Paginated transaction history table with export functionality.
+
+```tsx
+import { PaymentHistory } from '@x402-solana/react';
+
+<PaymentHistory
+  maxItems={10}
+  showFilters={true}
+  exportable={true}
+  onTransactionClick={(signature) => viewDetails(signature)}
+/>
+```
+
+**Features:**
+- Mobile responsive (cards on mobile, table on desktop)
+- Filter by date/amount
+- Export to CSV
+- Links to Solscan
+
+### PriceTag
+
+Display USDC price with USD conversion.
+
+```tsx
+import { PriceTag } from '@x402-solana/react';
+
+<PriceTag
+  priceUSD={0.001}
+  variant="badge"   // 'badge' | 'inline'
+  showUSD={true}
+/>
+```
+
+**Output:** `💳 0.001 USDC ($0.001)`
+
+### WalletConnect
+
+Standard wallet connection button with network indicator.
+
+```tsx
+import { WalletConnect } from '@x402-solana/react';
+
+<WalletConnect
+  onConnect={(wallet) => console.log('Connected:', wallet)}
+  requiredNetwork="devnet"
+/>
+```
+
+**States:**
+- Disconnected: "Connect Wallet"
+- Connected: "9xQe...7yL (Devnet) ▼"
+- Wrong network: "Switch to Devnet"
+
+### Theming
+
+Customize component appearance with themes:
+
+```tsx
+import { defaultTheme, darkTheme, createTheme } from '@x402-solana/react';
+
+// Use default theme
+<PaymentButton theme={defaultTheme} />
+
+// Use dark theme
+<PaymentButton theme={darkTheme} />
+
+// Create custom theme
+const customTheme = createTheme({
+  colors: {
+    primary: '#FF6B35',
+    secondary: '#004E89',
+    success: '#06D6A0',
+    error: '#EF476F',
+    background: '#FFFFFF',
+    text: '#2B2D42',
+  },
+  borderRadius: '8px',
+  fontFamily: 'Inter, sans-serif',
+});
+
+<PaymentButton theme={customTheme} />
+```
+
+### Optional Styling
+
+Import optional CSS for animations and dark mode:
+
+```tsx
+import '@x402-solana/react/styles/base.css';
+```
+
+📚 **[Full Component Documentation](./src/components/COMPONENTS.md)**
 
 ## Advanced Usage
 

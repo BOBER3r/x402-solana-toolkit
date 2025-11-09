@@ -1,6 +1,6 @@
 {
   "name": "@x402-solana/cli",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "CLI tool for testing x402-enabled APIs on Solana",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -26,8 +26,8 @@
   "author": "x402-solana-toolkit contributors",
   "license": "MIT",
   "dependencies": {
-    "@x402-solana/client": "file:../client",
-    "@x402-solana/core": "file:../core",
+    "@x402-solana/client": "^0.2.0",
+    "@x402-solana/core": "^0.2.0",
     "@solana/web3.js": "^1.87.6",
     "@solana/spl-token": "^0.3.9",
     "bs58": "^5.0.0",
