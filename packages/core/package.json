@@ -1,6 +1,6 @@
 {
   "name": "@x402-solana/core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Core payment verification and x402 protocol implementation for Solana",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,7 +16,10 @@
     "solana",
     "payment",
     "usdc",
-    "verification"
+    "verification",
+    "payment-channels",
+    "micropayments",
+    "layer2"
   ],
   "author": "x402-solana-toolkit contributors",
   "license": "MIT",

@@ -32,7 +32,8 @@ import {
   createVerificationError,
 } from './verification-result';
 import { parseAndValidateSolanaPayment } from '../utils/x402-parser';
-import { X402Payment, PaymentAccept } from '../types/x402.types';
+import { X402Payment, PaymentAccept, ChannelPayload } from '../types/x402.types';
+import { ChannelPaymentVerifier, ChannelVerificationOptions } from './channel-verifier';
 
 /**
  * Default verification options
@@ -274,42 +275,54 @@ export class TransactionVerifier {
    * This method handles the official x402 protocol format where payment
    * data is sent in the X-PAYMENT header as base64-encoded JSON.
    *
-   * Supports both formats:
-   * 1. serializedTransaction - Official x402 format (preferred)
-   * 2. signature - Backwards compatibility format
+   * Supports two schemes:
+   * 1. scheme: 'exact' - On-chain transaction verification
+   *    - serializedTransaction (official x402 format)
+   *    - signature (backwards compatibility)
+   * 2. scheme: 'channel' - Off-chain payment channel verification
+   *    - channelId, amount, nonce, signature
    *
    * @param paymentHeader - X-PAYMENT header value (base64-encoded JSON)
    * @param paymentRequirements - Payment requirements that were requested
-   * @param options - Verification options
+   * @param options - Verification options (or ChannelVerificationOptions for channel scheme)
+   * @param channelProgramId - Required for 'channel' scheme: your channel program ID
    * @returns Verification result
    *
    * @example
    * ```typescript
-   * // Express middleware
+   * // Express middleware - exact scheme
    * const header = req.headers['x-payment'];
    * const requirements = {
+   *   scheme: 'exact',
    *   payTo: 'TokenAccount...',
    *   maxAmountRequired: '10000',
    *   asset: 'USDCMint...',
    *   // ... other fields
    * };
    *
+   * const result = await verifier.verifyX402Payment(header, requirements);
+   *
+   * // Express middleware - channel scheme
+   * const channelRequirements = {
+   *   scheme: 'channel',
+   *   payTo: 'ServerPubkey...',
+   *   maxAmountRequired: '10000',
+   *   // ... other fields
+   * };
+   *
    * const result = await verifier.verifyX402Payment(
    *   header,
-   *   requirements
+   *   channelRequirements,
+   *   {},
+   *   'YourChannelProgram111111111111111111111111'
    * );
-   *
-   * if (result.valid) {
-   *   // Payment verified - serve content
-   * } else {
-   *   // Payment invalid - return error
-   * }
    * ```
    */
   async verifyX402Payment(
     paymentHeader: string | undefined,
     paymentRequirements: PaymentAccept,
-    options: VerificationOptions = {}
+    options: VerificationOptions | ChannelVerificationOptions = {},
+    channelProgramId?: string
   ): Promise<VerificationResult> {
     try {
       // Parse and validate X-PAYMENT header
@@ -329,40 +342,110 @@ export class TransactionVerifier {
 
       const payment = parseResult.payment!;
 
-      // Extract transaction signature
-      let signature: string | null = null;
-
-      // Try to get signature directly from payload (backwards compatibility)
-      if (payment.payload.signature) {
-        signature = payment.payload.signature;
-      }
-      // Try to deserialize transaction to get signature (official x402 format)
-      else if (payment.payload.serializedTransaction) {
-        signature = await this.extractSignatureFromSerializedTransaction(
-          payment.payload.serializedTransaction
+      // Route based on payment scheme
+      if (payment.scheme === 'channel') {
+        return this.verifyChannelPayment(
+          payment,
+          paymentRequirements,
+          options as ChannelVerificationOptions,
+          channelProgramId
         );
-
-        if (!signature) {
-          return createInvalidHeaderError(
-            'Could not extract signature from serialized transaction'
-          );
-        }
+      } else if (payment.scheme === 'exact') {
+        return this.verifyExactPayment(payment, paymentRequirements, options as VerificationOptions);
       } else {
         return createInvalidHeaderError(
-          'Payment payload must contain either signature or serializedTransaction'
+          `Unsupported payment scheme: ${payment.scheme}`
         );
       }
-
-      // Verify the payment using extracted signature
-      return this.verifyPayment(
-        signature,
-        paymentRequirements.payTo,
-        parseFloat(paymentRequirements.maxAmountRequired) / 1_000_000, // Convert micro-USDC to USD
-        options
-      );
     } catch (error: any) {
       return createVerificationError(error.message, error);
     }
+  }
+
+  /**
+   * Verify 'exact' scheme payment (on-chain transaction)
+   * @private
+   */
+  private async verifyExactPayment(
+    payment: X402Payment,
+    paymentRequirements: PaymentAccept,
+    options: VerificationOptions
+  ): Promise<VerificationResult> {
+    // Extract transaction signature
+    let signature: string | null = null;
+
+    // Try to get signature directly from payload (backwards compatibility)
+    if (payment.payload.signature) {
+      signature = payment.payload.signature;
+    }
+    // Try to deserialize transaction to get signature (official x402 format)
+    else if (payment.payload.serializedTransaction) {
+      signature = await this.extractSignatureFromSerializedTransaction(
+        payment.payload.serializedTransaction
+      );
+
+      if (!signature) {
+        return createInvalidHeaderError(
+          'Could not extract signature from serialized transaction'
+        );
+      }
+    } else {
+      return createInvalidHeaderError(
+        'Payment payload must contain either signature or serializedTransaction'
+      );
+    }
+
+    // Verify the payment using extracted signature
+    return this.verifyPayment(
+      signature,
+      paymentRequirements.payTo,
+      parseFloat(paymentRequirements.maxAmountRequired) / 1_000_000, // Convert micro-USDC to USD
+      options
+    );
+  }
+
+  /**
+   * Verify 'channel' scheme payment (off-chain payment channel)
+   * @private
+   */
+  private async verifyChannelPayment(
+    payment: X402Payment,
+    paymentRequirements: PaymentAccept,
+    options: ChannelVerificationOptions,
+    channelProgramId?: string
+  ): Promise<VerificationResult> {
+    // Validate channel program ID is provided
+    if (!channelProgramId) {
+      return createInvalidHeaderError(
+        'channelProgramId is required for channel scheme verification'
+      );
+    }
+
+    // Extract channel payload
+    const channelPayload: ChannelPayload = {
+      channelId: payment.payload.channelId!,
+      amount: payment.payload.amount!,
+      nonce: payment.payload.nonce!,
+      signature: payment.payload.channelSignature!,
+      expiry: payment.payload.expiry,
+    };
+
+    // Create channel verifier
+    const channelVerifier = new ChannelPaymentVerifier({
+      connection: this.connection,
+      programId: channelProgramId,
+    });
+
+    // Verify channel payment
+    return channelVerifier.verifyChannelPayment(
+      channelPayload,
+      paymentRequirements.payTo, // Expected server public key
+      {
+        expectedServer: options.expectedServer,
+        minClaimIncrement: options.minClaimIncrement,
+        skipExpiryCheck: options.skipExpiryCheck,
+      }
+    );
   }
 
   /**

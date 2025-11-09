@@ -24,6 +24,7 @@ npm install @x402-solana/core @solana/web3.js
 
 - ✅ **x402 v1 Compliant** - Official protocol implementation
 - ✅ **Transaction Verification** - Parse and verify Solana transactions
+- ✅ **Payment Channels** (NEW in v0.3.0) - Off-chain instant micropayments
 - ✅ **USDC Validation** - Validate SPL token transfers on-chain
 - ✅ **Replay Protection** - Prevent payment signature reuse
 - ✅ **Payment Requirements** - Generate x402-compliant 402 responses
@@ -31,11 +32,29 @@ npm install @x402-solana/core @solana/web3.js
 - ✅ **Flexible Format** - Supports `serializedTransaction` and `signature`
 - ✅ **Network Support** - Works with devnet and mainnet-beta
 - ✅ **Legacy & Versioned** - Supports both transaction formats
-- ✅ **96 Unit Tests** - Comprehensive test coverage
+- ✅ **Dual Schemes** - On-chain (`exact`) and off-chain (`channel`)
+
+## Payment Schemes
+
+Starting with **v0.3.0**, this package supports TWO payment schemes:
+
+### 1. On-Chain Payments (`scheme: 'exact'`)
+Traditional USDC transactions verified on Solana blockchain:
+- **Latency:** 400-800ms
+- **Cost:** ~$0.0005 per payment
+- **Best for:** Low-frequency, sporadic usage
+
+### 2. Payment Channels (`scheme: 'channel'`) - NEW!
+Off-chain cryptographic claims verified instantly:
+- **Latency:** <10ms
+- **Cost:** $0 per payment (after channel setup)
+- **Best for:** High-frequency (100+ req/hr), streaming data, AI billing
+
+See [CHANNEL_PAYMENTS.md](./CHANNEL_PAYMENTS.md) for full documentation.
 
 ## Quick Start
 
-### Verify a Payment
+### Verify an On-Chain Payment
 
 ```typescript
 import { TransactionVerifier } from '@x402-solana/core';
@@ -83,6 +102,45 @@ const requirements = generator.generate(0.01, {
 // Return in 402 response
 res.status(402).json(requirements);
 ```
+
+### Verify a Channel Payment (NEW in v0.3.0)
+
+```typescript
+import { TransactionVerifier } from '@x402-solana/core';
+
+const verifier = new TransactionVerifier({
+  rpcUrl: 'https://api.devnet.solana.com',
+  commitment: 'confirmed',
+});
+
+// Payment requirements for channel scheme
+const requirements = {
+  scheme: 'channel',  // ← Off-chain payment channel
+  network: 'solana-devnet',
+  payTo: 'ServerWalletPubkey...',
+  maxAmountRequired: '10000',  // $0.01
+  resource: '/api/data',
+  description: 'API access',
+  mimeType: 'application/json',
+  asset: 'USDC',
+  maxTimeoutSeconds: 300,
+};
+
+// Verify channel payment (<10ms, $0 fee)
+const result = await verifier.verifyX402Payment(
+  req.headers['x-payment'],
+  requirements,
+  {},
+  process.env.CHANNEL_PROGRAM_ID  // Required for channels!
+);
+
+if (result.valid) {
+  console.log('✅ Channel payment verified instantly!');
+  console.log('Amount:', result.transfer?.amount, 'micro-USDC');
+}
+```
+
+See [CHANNEL_PAYMENTS.md](./CHANNEL_PAYMENTS.md) for complete guide.
 
 ### Prevent Replay Attacks
 
@@ -250,6 +308,8 @@ const transfers = extractUSDCTransfers(transaction, 'devnet');
 
 ## Error Codes
 
+### On-Chain (scheme: 'exact')
+
 | Code | Description |
 |------|-------------|
 | `TRANSACTION_NOT_FOUND` | Signature doesn't exist on-chain |
@@ -260,6 +320,20 @@ const transfers = extractUSDCTransfers(transaction, 'devnet');
 | `PAYMENT_EXPIRED` | Transaction too old |
 | `INVALID_SIGNATURE` | Malformed transaction signature |
 | `REPLAY_ATTACK` | Signature already used |
+
+### Payment Channels (scheme: 'channel') - NEW in v0.3.0
+
+| Code | Description |
+|------|-------------|
+| `CHANNEL_NOT_FOUND` | Channel PDA not found on-chain |
+| `CHANNEL_NOT_OPEN` | Channel is Closed or Disputed |
+| `CHANNEL_INVALID_SIGNATURE` | Ed25519 signature verification failed |
+| `CHANNEL_INVALID_NONCE` | Nonce not strictly increasing |
+| `CHANNEL_AMOUNT_BACKWARDS` | Claimed amount < previous claim |
+| `CHANNEL_INSUFFICIENT_BALANCE` | Claim exceeds deposit + credit |
+| `CHANNEL_CLAIM_EXPIRED` | Claim past expiry timestamp |
+| `CHANNEL_WRONG_SERVER` | Server pubkey mismatch |
+| `CHANNEL_INVALID_PAYLOAD` | Malformed channel payload |
 
 ## Testing
 

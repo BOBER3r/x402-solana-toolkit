@@ -9,6 +9,30 @@ import { WalletConnectProps } from './types';
 import { WalletIcon, WarningIcon, Spinner, CheckIcon } from '../shared';
 
 /**
+ * Helper function to safely check wallet connection
+ * Prevents React 19 strict mode errors with wallet adapter proxy
+ */
+function getSafeWalletConnected(wallet: any): boolean {
+  try {
+    return wallet?.connected || false;
+  } catch (err) {
+    return false;
+  }
+}
+
+/**
+ * Helper function to safely get wallet public key
+ * Prevents React 19 strict mode errors with wallet adapter proxy
+ */
+function getSafeWalletPublicKey(wallet: any): any {
+  try {
+    return wallet?.publicKey || null;
+  } catch (err) {
+    return null;
+  }
+}
+
+/**
  * Component for wallet connection with network validation
  *
  * Provides a button for connecting/disconnecting wallets with
@@ -68,12 +92,15 @@ export function WalletConnect({
 
   // Trigger callbacks on connection state change
   useEffect(() => {
-    if (wallet.connected && wallet.publicKey) {
-      onConnect?.(wallet.publicKey.toBase58());
-    } else if (!wallet.connected) {
+    const isConnected = getSafeWalletConnected(wallet);
+    const publicKey = getSafeWalletPublicKey(wallet);
+
+    if (isConnected && publicKey) {
+      onConnect?.(publicKey.toBase58());
+    } else if (!isConnected) {
       onDisconnect?.();
     }
-  }, [wallet.connected, wallet.publicKey, onConnect, onDisconnect]);
+  }, [wallet, onConnect, onDisconnect]);
 
   const handleConnect = async () => {
     try {
@@ -183,7 +210,9 @@ export function WalletConnect({
   };
 
   // Not connected
-  if (!wallet.connected) {
+  const isConnected = getSafeWalletConnected(wallet);
+
+  if (!isConnected) {
     return (
       <button
         onClick={handleConnect}
@@ -209,8 +238,9 @@ export function WalletConnect({
   }
 
   // Connected - show wallet info
-  const shortAddress = wallet.publicKey
-    ? `${wallet.publicKey.toBase58().slice(0, 4)}...${wallet.publicKey.toBase58().slice(-4)}`
+  const publicKey = getSafeWalletPublicKey(wallet);
+  const shortAddress = publicKey
+    ? `${publicKey.toBase58().slice(0, 4)}...${publicKey.toBase58().slice(-4)}`
     : '';
 
   return (

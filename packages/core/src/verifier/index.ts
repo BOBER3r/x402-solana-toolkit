@@ -4,6 +4,7 @@
  */
 
 export * from './transaction-verifier';
+export * from './channel-verifier';
 export * from './usdc-verifier';
 export * from './payment-cache';
 export * from './verification-result';

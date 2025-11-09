@@ -60,6 +60,7 @@ export * from './types';
 
 export {
   TransactionVerifier,
+  ChannelPaymentVerifier,
   verifyUSDCTransfer,
   IPaymentCache,
   RedisPaymentCache,
@@ -80,6 +81,12 @@ export {
   getErrorCode,
   formatVerificationResult,
 } from './verifier';
+
+export type {
+  ChannelState,
+  ChannelVerifierConfig,
+  ChannelVerificationOptions,
+} from './verifier/channel-verifier';
 
 // ============================================================================
 // Generator Components
@@ -169,6 +176,7 @@ export {
   extractSignature,
   createSolanaPaymentHeader,
   createSolanaPaymentHeaderWithTransaction,
+  createChannelPaymentHeader,
   X402ParseError,
 } from './utils/x402-parser';
 

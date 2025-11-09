@@ -296,24 +296,38 @@ export const X402Provider: React.FC<X402ProviderProps> = ({
   ]);
 
   // Context value
-  const contextValue = useMemo<X402ContextValue>(() => ({
-    config: fullConfig,
-    connection,
-    wallet: wallet as any,
-    publicKey: (wallet?.publicKey || null) as PublicKey | null,
-    connected: wallet?.connected || false,
-    fetch: fetchWithPayment,
-    getBalance,
-    paymentHistory,
-    clearHistory,
-    isLoading,
-    error,
-  }), [
+  const contextValue = useMemo<X402ContextValue>(() => {
+    // Don't access wallet properties during render - let consumers access them
+    // This avoids React 19 strict mode errors with wallet adapter
+    return {
+      config: fullConfig,
+      connection,
+      wallet: wallet as any,
+      get publicKey() {
+        try {
+          return wallet?.publicKey || null;
+        } catch {
+          return null;
+        }
+      },
+      get connected() {
+        try {
+          return wallet?.connected || false;
+        } catch {
+          return false;
+        }
+      },
+      fetch: fetchWithPayment,
+      getBalance,
+      paymentHistory,
+      clearHistory,
+      isLoading,
+      error,
+    };
+  }, [
     fullConfig,
     connection,
     wallet,
-    wallet?.publicKey,
-    wallet?.connected,
     fetchWithPayment,
     getBalance,
     paymentHistory,

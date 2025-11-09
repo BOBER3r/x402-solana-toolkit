@@ -16,6 +16,24 @@ import {
 } from '../utils/wallet-adapter';
 
 /**
+ * Helper function to safely check wallet state
+ * Prevents React 19 strict mode errors with wallet adapter proxy
+ */
+function getSafeWalletState(wallet: any): { isConnected: boolean; hasPublicKey: boolean } {
+  try {
+    return {
+      isConnected: wallet?.connected || false,
+      hasPublicKey: !!wallet?.publicKey,
+    };
+  } catch (err) {
+    return {
+      isConnected: false,
+      hasPublicKey: false,
+    };
+  }
+}
+
+/**
  * Hook for monitoring wallet balances
  *
  * Fetches USDC and SOL balances for the connected wallet,
@@ -73,7 +91,9 @@ export function useWalletBalance(
 
   // Fetch balances
   const fetchBalances = useCallback(async () => {
-    if (!wallet.publicKey || !wallet.connected) {
+    const { isConnected, hasPublicKey } = getSafeWalletState(wallet);
+
+    if (!hasPublicKey || !isConnected) {
       setUsdcBalance(0);
       setSolBalance(0);
       return;
@@ -117,25 +137,29 @@ export function useWalletBalance(
 
   // Initial fetch when wallet connects
   useEffect(() => {
-    if (wallet.connected && wallet.publicKey) {
+    const { isConnected, hasPublicKey } = getSafeWalletState(wallet);
+
+    if (isConnected && hasPublicKey) {
       fetchBalances();
     } else {
       // Reset balances when wallet disconnects
       setUsdcBalance(0);
       setSolBalance(0);
     }
-  }, [wallet.connected, wallet.publicKey, fetchBalances]);
+  }, [wallet, fetchBalances]);
 
   // Auto-refresh interval
   useEffect(() => {
-    if (refreshInterval > 0 && wallet.connected && wallet.publicKey) {
+    const { isConnected, hasPublicKey } = getSafeWalletState(wallet);
+
+    if (refreshInterval > 0 && isConnected && hasPublicKey) {
       const intervalId = setInterval(() => {
         fetchBalances();
       }, refreshInterval);
 
       return () => clearInterval(intervalId);
     }
-  }, [refreshInterval, wallet.connected, wallet.publicKey, fetchBalances]);
+  }, [refreshInterval, wallet, fetchBalances]);
 
   return {
     usdcBalance,

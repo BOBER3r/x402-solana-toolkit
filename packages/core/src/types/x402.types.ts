@@ -87,18 +87,65 @@ export interface X402Payment {
  * - Contains base64-encoded serialized transaction
  * - Transaction must include SPL token transfer instruction
  *
+ * For Solana 'channel' scheme:
+ * - Contains payment channel claim data
+ * - Verified off-chain against channel state
+ *
  * For EVM chains:
  * - Would contain different data structure
  */
 export interface PaymentPayload {
-  /** For Solana: base64-encoded serialized transaction */
+  /** For Solana 'exact': base64-encoded serialized transaction */
   serializedTransaction?: string;
 
-  /** For backwards compatibility: transaction signature */
+  /** For Solana 'exact': transaction signature (backwards compatibility) */
   signature?: string;
+
+  /** For Solana 'channel': Base58-encoded channel PDA address */
+  channelId?: string;
+
+  /** For Solana 'channel': Cumulative amount claimed (string for bigint) */
+  amount?: string;
+
+  /** For Solana 'channel': Current nonce (string for bigint) */
+  nonce?: string;
+
+  /** For Solana 'channel': Base64-encoded Ed25519 signature (64 bytes) */
+  channelSignature?: string;
+
+  /** For Solana 'channel': Optional expiry timestamp (Unix seconds) */
+  expiry?: string;
 
   /** Scheme-specific additional data */
   [key: string]: any;
+}
+
+/**
+ * Payment channel payload interface
+ * Used for scheme: 'channel' payments
+ *
+ * Structure:
+ * - channelId: Base58-encoded PDA of the channel account
+ * - amount: Total cumulative amount claimed from channel (micro-USDC)
+ * - nonce: Monotonically increasing counter for replay protection
+ * - signature: Ed25519 signature over domain + channelId + server + amount + nonce + expiry
+ * - expiry: Optional Unix timestamp when claim expires
+ */
+export interface ChannelPayload {
+  /** Base58-encoded channel PDA address */
+  channelId: string;
+
+  /** Total cumulative amount claimed in micro-USDC (string to support bigint) */
+  amount: string;
+
+  /** Current nonce for replay protection (string to support bigint) */
+  nonce: string;
+
+  /** Base64-encoded Ed25519 signature (64 bytes) */
+  signature: string;
+
+  /** Optional: Unix timestamp when claim expires */
+  expiry?: string;
 }
 
 /**
@@ -211,6 +258,34 @@ export enum X402ErrorCode {
 
   /** Internal verification error */
   VERIFICATION_ERROR = 'VERIFICATION_ERROR',
+
+  // Payment channel error codes
+  /** Channel not found on-chain */
+  CHANNEL_NOT_FOUND = 'CHANNEL_NOT_FOUND',
+
+  /** Channel is not in Open status */
+  CHANNEL_NOT_OPEN = 'CHANNEL_NOT_OPEN',
+
+  /** Channel signature verification failed */
+  CHANNEL_INVALID_SIGNATURE = 'CHANNEL_INVALID_SIGNATURE',
+
+  /** Channel claim nonce is not greater than current nonce */
+  CHANNEL_INVALID_NONCE = 'CHANNEL_INVALID_NONCE',
+
+  /** Channel claim amount is less than current server claimed amount */
+  CHANNEL_AMOUNT_BACKWARDS = 'CHANNEL_AMOUNT_BACKWARDS',
+
+  /** Channel claim amount exceeds available balance */
+  CHANNEL_INSUFFICIENT_BALANCE = 'CHANNEL_INSUFFICIENT_BALANCE',
+
+  /** Channel claim has expired */
+  CHANNEL_CLAIM_EXPIRED = 'CHANNEL_CLAIM_EXPIRED',
+
+  /** Server pubkey doesn't match expected recipient */
+  CHANNEL_WRONG_SERVER = 'CHANNEL_WRONG_SERVER',
+
+  /** Invalid channel payload */
+  CHANNEL_INVALID_PAYLOAD = 'CHANNEL_INVALID_PAYLOAD',
 }
 
 /**

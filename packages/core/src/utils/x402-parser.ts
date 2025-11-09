@@ -189,26 +189,38 @@ export function isValidSolanaNetwork(network: string): boolean {
 }
 
 /**
- * Validate payment payload for Solana 'exact' scheme
- * Requires either 'serializedTransaction' or 'signature' field
+ * Validate payment payload for Solana schemes
+ * Supports both 'exact' (on-chain) and 'channel' (off-chain) schemes
  *
  * @param payload - Payment payload to validate
- * @param scheme - Payment scheme (should be 'exact')
+ * @param scheme - Payment scheme ('exact' or 'channel')
  * @returns Validation result
  */
 export function validateSolanaPayload(
   payload: PaymentPayload,
   scheme: string
 ): ParseResult {
-  // For 'exact' scheme on Solana, we need transaction data
-  if (scheme !== 'exact') {
+  if (scheme === 'exact') {
+    return validateExactPayload(payload);
+  } else if (scheme === 'channel') {
+    return validateChannelPayload(payload);
+  } else {
     return {
       success: false,
       error: `Unsupported scheme for Solana: ${scheme}`,
       code: X402ParseError.UNSUPPORTED_SCHEME,
     };
   }
+}
 
+/**
+ * Validate payload for 'exact' scheme (on-chain transaction)
+ * Requires either 'serializedTransaction' or 'signature' field
+ *
+ * @param payload - Payment payload to validate
+ * @returns Validation result
+ */
+function validateExactPayload(payload: PaymentPayload): ParseResult {
   // Check for serializedTransaction (official x402 format)
   const hasSerializedTx =
     typeof payload.serializedTransaction === 'string' &&
@@ -225,6 +237,108 @@ export function validateSolanaPayload(
         'Payload must contain either serializedTransaction or signature field',
       code: X402ParseError.INVALID_PAYLOAD,
     };
+  }
+
+  return {
+    success: true,
+  };
+}
+
+/**
+ * Validate payload for 'channel' scheme (off-chain channel payment)
+ * Requires channelId, amount, nonce, and signature fields
+ *
+ * @param payload - Payment payload to validate
+ * @returns Validation result
+ */
+function validateChannelPayload(payload: PaymentPayload): ParseResult {
+  // Check for required fields
+  if (!payload.channelId || typeof payload.channelId !== 'string') {
+    return {
+      success: false,
+      error: 'Channel payload must contain channelId field',
+      code: X402ParseError.INVALID_PAYLOAD,
+    };
+  }
+
+  if (!payload.amount || typeof payload.amount !== 'string') {
+    return {
+      success: false,
+      error: 'Channel payload must contain amount field',
+      code: X402ParseError.INVALID_PAYLOAD,
+    };
+  }
+
+  if (!payload.nonce || typeof payload.nonce !== 'string') {
+    return {
+      success: false,
+      error: 'Channel payload must contain nonce field',
+      code: X402ParseError.INVALID_PAYLOAD,
+    };
+  }
+
+  if (!payload.channelSignature || typeof payload.channelSignature !== 'string') {
+    return {
+      success: false,
+      error: 'Channel payload must contain channelSignature field',
+      code: X402ParseError.INVALID_PAYLOAD,
+    };
+  }
+
+  // Validate amount format
+  try {
+    const amount = BigInt(payload.amount);
+    if (amount < 0n) {
+      return {
+        success: false,
+        error: 'Channel amount cannot be negative',
+        code: X402ParseError.INVALID_PAYLOAD,
+      };
+    }
+  } catch {
+    return {
+      success: false,
+      error: `Invalid channel amount format: ${payload.amount}`,
+      code: X402ParseError.INVALID_PAYLOAD,
+    };
+  }
+
+  // Validate nonce format
+  try {
+    const nonce = BigInt(payload.nonce);
+    if (nonce < 0n) {
+      return {
+        success: false,
+        error: 'Channel nonce cannot be negative',
+        code: X402ParseError.INVALID_PAYLOAD,
+      };
+    }
+  } catch {
+    return {
+      success: false,
+      error: `Invalid channel nonce format: ${payload.nonce}`,
+      code: X402ParseError.INVALID_PAYLOAD,
+    };
+  }
+
+  // Validate expiry format (if provided)
+  if (payload.expiry !== undefined) {
+    try {
+      const expiry = BigInt(payload.expiry);
+      if (expiry < 0n) {
+        return {
+          success: false,
+          error: 'Channel expiry cannot be negative',
+          code: X402ParseError.INVALID_PAYLOAD,
+        };
+      }
+    } catch {
+      return {
+        success: false,
+        error: `Invalid channel expiry format: ${payload.expiry}`,
+        code: X402ParseError.INVALID_PAYLOAD,
+      };
+    }
   }
 
   return {
@@ -386,6 +500,64 @@ export function createSolanaPaymentHeaderWithTransaction(
     payload: {
       serializedTransaction,
     },
+  };
+
+  return encodeX402Payment(payment);
+}
+
+/**
+ * Create X-PAYMENT header for payment channel claim
+ * x402 'channel' scheme for off-chain payments
+ *
+ * @param channelId - Base58-encoded channel PDA address
+ * @param amount - Total cumulative amount claimed (micro-USDC)
+ * @param nonce - Current nonce for replay protection
+ * @param signature - Base64-encoded Ed25519 signature (64 bytes)
+ * @param network - Network identifier
+ * @param expiry - Optional expiry timestamp (Unix seconds)
+ * @returns Base64-encoded X-PAYMENT header value
+ *
+ * @example
+ * ```typescript
+ * const header = createChannelPaymentHeader(
+ *   'ChannelPDA...',
+ *   '1000000',      // $1 claimed total
+ *   '5',            // 5th payment
+ *   'base64Sig...', // Ed25519 signature
+ *   'solana-devnet',
+ *   '1735689600'    // Optional expiry
+ * );
+ *
+ * // Use in HTTP request
+ * fetch(url, {
+ *   headers: { 'X-PAYMENT': header }
+ * });
+ * ```
+ */
+export function createChannelPaymentHeader(
+  channelId: string,
+  amount: string,
+  nonce: string,
+  signature: string,
+  network: 'solana-devnet' | 'solana-mainnet',
+  expiry?: string
+): string {
+  const payload: PaymentPayload = {
+    channelId,
+    amount,
+    nonce,
+    channelSignature: signature,
+  };
+
+  if (expiry !== undefined) {
+    payload.expiry = expiry;
+  }
+
+  const payment: X402Payment = {
+    x402Version: 1,
+    scheme: 'channel',
+    network,
+    payload,
   };
 
   return encodeX402Payment(payment);

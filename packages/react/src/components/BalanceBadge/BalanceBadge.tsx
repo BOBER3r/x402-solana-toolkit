@@ -10,6 +10,24 @@ import { BalanceBadgeProps } from './types';
 import { RefreshIcon, WarningIcon, Spinner } from '../shared';
 
 /**
+ * Helper function to safely check wallet state
+ * Prevents React 19 strict mode errors with wallet adapter proxy
+ */
+function getSafeWalletState(wallet: any): { isConnected: boolean; hasPublicKey: boolean } {
+  try {
+    return {
+      isConnected: wallet?.connected || false,
+      hasPublicKey: !!wallet?.publicKey,
+    };
+  } catch (err) {
+    return {
+      isConnected: false,
+      hasPublicKey: false,
+    };
+  }
+}
+
+/**
  * Component for displaying wallet balances
  *
  * Shows SOL and/or USDC balances with auto-refresh capability
@@ -59,7 +77,9 @@ export function BalanceBadge({
   }, [isLowBalance, usdcBalance, onLowBalance]);
 
   // Not connected state
-  if (!wallet.connected || !wallet.publicKey) {
+  const { isConnected, hasPublicKey } = getSafeWalletState(wallet);
+
+  if (!isConnected || !hasPublicKey) {
     return (
       <div
         className={`x402-balance-badge x402-balance-badge-disconnected ${className}`}

@@ -74,6 +74,7 @@ export function useX402Payment(
 
   // Detect network from connection endpoint
   const network = useMemo(() => {
+    if (!connection?.rpcEndpoint) return 'mainnet-beta';
     const endpoint = connection.rpcEndpoint;
     return endpoint.includes('devnet') ? 'devnet' : 'mainnet-beta';
   }, [connection]);

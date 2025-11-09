@@ -56,7 +56,8 @@ export function PaymentButton({
   method = 'GET',
   fetchOptions = {},
 }: PaymentButtonProps) {
-  const wallet = useWallet();
+  // Destructure wallet values directly - this is safe and doesn't trigger proxy errors
+  const { connected, publicKey } = useWallet();
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const { fetch: fetchWithPayment, isLoading } = useX402Payment({
@@ -73,8 +74,8 @@ export function PaymentButton({
   });
 
   const handleClick = useCallback(async () => {
-    // Check wallet connection
-    if (!wallet.connected || !wallet.publicKey) {
+    // Check wallet connection - use destructured values directly
+    if (!connected || !publicKey) {
       const err = new Error('Please connect your wallet first');
       setStatus('error');
       onError?.(err);
@@ -123,7 +124,7 @@ export function PaymentButton({
       // Reset to idle after 3 seconds
       setTimeout(() => setStatus('idle'), 3000);
     }
-  }, [wallet, endpoint, method, fetchOptions, fetchWithPayment, onSuccess, onError]);
+  }, [connected, publicKey, endpoint, method, fetchOptions, fetchWithPayment, onSuccess, onError]);
 
   // Size styles
   const sizeStyles: Record<string, React.CSSProperties> = {
