@@ -1,6 +1,6 @@
 # x402-solana-toolkit
 
-##Checkout [BoberPay](https://boberpay.com/)
+## Checkout [BoberPay](https://boberpay.com/)
 
 **Add x402 micropayments to any Solana API in under 5 lines of code.**
 
