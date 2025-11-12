@@ -1,5 +1,7 @@
 # x402-solana-toolkit
 
+##Checkout [BoberPay](https://boberpay.com/)
+
 **Add x402 micropayments to any Solana API in under 5 lines of code.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -7,9 +9,8 @@
 [![Solana](https://img.shields.io/badge/Solana-Web3.js-9945FF)](https://solana.com)
 [![x402](https://img.shields.io/badge/x402-v1%20Compliant-success)](https://github.com/coinbase/x402)
 
-A production-grade TypeScript library that enables any HTTP API on Solana to implement the official **x402 payment protocol**. Framework-agnostic, fully typed, and battle-tested.
 
-> **🏆 x402 Hackathon**: This toolkit is fully compliant with the official x402 protocol specification and qualifies for the "Best x402 Dev Tool" track. [See X402_COMPLIANCE.md](./X402_COMPLIANCE.md) 
+> **🏆 x402 Hackathon**: [See X402_COMPLIANCE.md](./X402_COMPLIANCE.md) 
 ---
 
 ## 📥 Installation
@@ -221,7 +222,6 @@ Complete betting platform API with AI agent client.
 - **4 endpoints**: 1 free, 3 paid
 - **Dynamic pricing**: $0.10 + 2% for bet execution
 - **Real economics**: Agent spends $0.25, expects $0.48 profit
-- **~900 lines** of production-ready code
 
 ### [03-weather-api](./examples/03-weather-api)
 Realistic weather API with tiered pricing.
